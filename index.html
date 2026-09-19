@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Pixel GrokBots — watch your Grok Bots work the floor</title>
+  <meta name="description" content="A pixel-art office for Grok Bot teammates and Grok Build sessions. Characters walk, type, hand off work, and raise a flag when they need approval." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Syne:wght@600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --void: #07080b;
+      --panel: #10131a;
+      --panel-2: #161a24;
+      --bone: #efece4;
+      --mute: #8b8894;
+      --line: #262a36;
+      --violet: #8b7cff;
+      --cyan: #6ee7ff;
+      --alert: #ff5a6a;
+      --ok: #5dffb2;
+      --gold: #f2d27a;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: "IBM Plex Mono", ui-monospace, monospace;
+      background: var(--void);
+      color: var(--bone);
+      line-height: 1.55;
+    }
+    a { color: var(--cyan); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .wrap { width: min(1180px, calc(100% - 40px)); margin: 0 auto; }
+    header {
+      position: sticky; top: 0; z-index: 20;
+      backdrop-filter: blur(16px);
+      background: rgba(7,8,11,.78);
+      border-bottom: 1px solid var(--line);
+    }
+    .nav {
+      display: flex; align-items: center; justify-content: space-between;
+      height: 64px;
+    }
+    .brand { display: flex; align-items: center; gap: 10px; color: var(--bone); text-decoration: none; }
+    .brand-mark {
+      width: 22px; height: 22px; image-rendering: pixelated;
+      background:
+        linear-gradient(#8b7cff 0 4px, transparent 4px 18px, #6ee7ff 18px 22px),
+        linear-gradient(90deg, #8b7cff 0 4px, transparent 4px 18px, #f2d27a 18px 22px);
+    }
+    .brand b { font-family: Syne, sans-serif; letter-spacing: .04em; font-size: 15px; }
+    nav { display: flex; gap: 22px; font-size: 12px; text-transform: uppercase; letter-spacing: .12em; }
+    nav a { color: var(--mute); text-decoration: none; }
+    nav a:hover { color: var(--bone); }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      border: 1px solid var(--line); background: var(--panel-2); color: var(--bone);
+      padding: 10px 14px; font: inherit; font-size: 12px; letter-spacing: .08em;
+      text-transform: uppercase; cursor: pointer; text-decoration: none;
+    }
+    .btn:hover { border-color: var(--violet); text-decoration: none; }
+    .btn.primary { background: var(--bone); color: #0b0c10; border-color: var(--bone); }
+    .hero { padding: 56px 0 28px; }
+    .kicker {
+      color: var(--violet); font-size: 11px; letter-spacing: .22em; text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+    h1 {
+      font-family: Syne, sans-serif; font-size: clamp(36px, 6vw, 72px);
+      line-height: .95; letter-spacing: -.03em; max-width: 16ch;
+    }
+    .lede { max-width: 62ch; color: var(--mute); margin: 18px 0 26px; }
+    .cta { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 36px; }
+    .office-shell {
+      border: 1px solid var(--line); background: #0b0d13;
+      display: grid; grid-template-columns: 1fr 300px;
+    }
+    .office-top {
+      grid-column: 1 / -1; display: flex; justify-content: space-between; align-items: center;
+      padding: 10px 14px; border-bottom: 1px solid var(--line); font-size: 11px; letter-spacing: .14em;
+      text-transform: uppercase; color: var(--mute);
+    }
+    .dot { width: 7px; height: 7px; background: var(--ok); display: inline-block; margin-right: 8px; animation: pulse 1.6s infinite; }
+    @keyframes pulse { 50% { opacity: .35; } }
+    canvas { display: block; width: 100%; height: auto; background: #0a0c12; cursor: crosshair; }
+    .log {
+      border-left: 1px solid var(--line); padding: 12px; height: 100%;
+      overflow: auto; font-size: 11px;
+    }
+    .log h3 { font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--mute); margin-bottom: 10px; }
+    .log-item { padding: 7px 0; border-bottom: 1px solid #1c2030; color: #c9c4b8; }
+    .log-item b { color: var(--cyan); font-weight: 600; }
+    .log-item .t { color: var(--mute); }
+    .selected {
+      margin-top: 14px; padding: 12px; background: var(--panel); border: 1px solid var(--line);
+    }
+    section { padding: 72px 0; border-top: 1px solid var(--line); }
+    h2 { font-family: Syne, sans-serif; font-size: clamp(26px, 4vw, 42px); letter-spacing: -.03em; margin-bottom: 10px; }
+    .sub { color: var(--mute); max-width: 62ch; margin-bottom: 28px; }
+    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .card { background: var(--panel); border: 1px solid var(--line); padding: 18px; }
+    .card h3 { font-size: 14px; margin-bottom: 8px; }
+    .card p { color: var(--mute); font-size: 13px; }
+    .bots { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .bot { border: 1px solid var(--line); background: linear-gradient(180deg, #141824, #0e1118); padding: 18px; }
+    .swatch { width: 36px; height: 36px; image-rendering: pixelated; margin-bottom: 12px; }
+    .bot .role { color: var(--violet); font-size: 11px; letter-spacing: .16em; text-transform: uppercase; margin-bottom: 6px; }
+    pre {
+      background: #0b0d13; border: 1px solid var(--line); padding: 16px; overflow: auto;
+      font-size: 12px; color: #d7d2c6; line-height: 1.6;
+    }
+    footer { border-top: 1px solid var(--line); padding: 28px 0 48px; color: var(--mute); font-size: 12px; }
+    .foot { display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+    @media (max-width: 900px) {
+      nav { display: none; }
+      .office-shell, .grid, .bots { grid-template-columns: 1fr; }
+      .log { border-left: 0; border-top: 1px solid var(--line); min-height: 180px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap nav">
+      <a class="brand" href="#">
+        <span class="brand-mark"></span>
+        <b>PIXEL GROKBOTS</b>
+      </a>
+      <nav>
+        <a href="#office">Office</a>
+        <a href="#features">Features</a>
+        <a href="#roster">Bots</a>
+        <a href="#hooks">Hooks</a>
+        <a href="https://github.com/Davidgon8/pixel-grokbots">Repo</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="hero" id="office" style="border:0;padding-top:56px">
+      <div class="kicker">v0 demo · Grok Bot + Grok Build</div>
+      <h1>The most playful way to watch your Grok Bots work.</h1>
+      <p class="lede">Pixel GrokBots turns named Grok Bot teammates and Grok Build sessions into animated characters on a tiny night-shift office floor. They walk to desks, type when they edit, read when they search, hand work across the room, and raise a flag when an approval gate fires. The glowing rack in the middle is the shared cloud computer.</p>
+      <div class="cta">
+        <a class="btn primary" href="#office-live">Open the floor</a>
+        <a class="btn" href="https://github.com/Davidgon8/pixel-grokbots">View the repo</a>
+        <a class="btn" href="https://x.ai/bot">Grok Bot</a>
+        <a class="btn" href="https://x.ai/cli">Grok Build</a>
+      </div>
+
+      <div class="office-shell" id="office-live">
+        <div class="office-top">
+          <span><i class="dot"></i>Live office · click a bot</span>
+          <span id="clock">00:00:00</span>
+        </div>
+        <canvas id="floor" width="784" height="448"></canvas>
+        <aside class="log">
+          <h3>Hook stream</h3>
+          <div id="events"></div>
+          <div class="selected" id="inspect">Click a character to pin their job.</div>
+        </aside>
+      </div>
+    </section>
+
+    <section id="features">
+      <h2>One bot, one character.</h2>
+      <p class="sub">The office is a visualization layer, not another chat window. Activity on the floor is meant to map onto real Grok Bot and Grok Build events.</p>
+      <div class="grid">
+        <article class="card"><h3>Live activity</h3><p>Typing, reading, browsing, and command-running each get their own animation so you can read the room without opening every thread.</p></article>
+        <article class="card"><h3>Approval bubbles</h3><p>When a bot hits a gate — send, publish, buy, delete — it stops and raises a red flag instead of disappearing into a transcript.</p></article>
+        <article class="card"><h3>Shared computer</h3><p>The center rack is the account-scoped cloud VM. Files, sessions, and logins live there. Subagents spawn from it and take a hot desk.</p></article>
+        <article class="card"><h3>Handoffs</h3><p>Orbit can walk a brief to Kai. Rex can drop a dossier on Nova’s desk. Group-chat delegation becomes a path across the floor.</p></article>
+        <article class="card"><h3>Routines</h3><p>Scheduled jobs walk in like a shift change. A clock spark on the character means a routine just fired.</p></article>
+        <article class="card"><h3>Ghost shift</h3><p>Bots still working after you close the laptop render translucent. The floor keeps moving while you are away.</p></article>
+      </div>
+    </section>
+
+    <section id="roster">
+      <h2>The night crew.</h2>
+      <p class="sub">Six original canvas sprites. Not Metro City. Not Claude orange. Built for Grok Bot jobs you would actually staff.</p>
+      <div class="bots">
+        <article class="bot"><div class="swatch" style="background:#8b7cff"></div><div class="role">Orchestrator</div><h3>Orbit</h3><p>Chief of staff. Breaks work up, walks briefs across the floor, pulls you in only for judgment.</p></article>
+        <article class="bot"><div class="swatch" style="background:#5dffb2"></div><div class="role">Grok Build</div><h3>Nova</h3><p>Engineer. Types when editing, runs commands, seats parallel subagents at the Build Bay.</p></article>
+        <article class="bot"><div class="swatch" style="background:#6ee7ff"></div><div class="role">Research</div><h3>Rex</h3><p>Reads, browses, files briefs. Lives next to the stacks. Hands dossiers to whoever asked.</p></article>
+        <article class="bot"><div class="swatch" style="background:#f2d27a"></div><div class="role">Ops</div><h3>Mira</h3><p>Inbox, invoices, calendars, Gmail connectors. Quiet unless a receipt needs a human.</p></article>
+        <article class="bot"><div class="swatch" style="background:#ff8a5a"></div><div class="role">Sales</div><h3>Kai</h3><p>Outbound and CRM. Drafts at the bench. Freezes with a bubble when a send needs approval.</p></article>
+        <article class="bot"><div class="swatch" style="background:#ff5a6a"></div><div class="role">Review</div><h3>Sol</h3><p>Sits the approval desk. Turns red flags back into motion when you sign off.</p></article>
+      </div>
+    </section>
+
+    <section id="hooks">
+      <h2>Hook the real agents in.</h2>
+      <p class="sub">v0 is a playable office with a simulated hook stream. The next step is a Grok Build provider — the same idea as Pixel Agents’ HookProvider, pointed at <code>grok</code> instead of Claude Code.</p>
+      <pre>Grok Build / Grok Bot event     →   Office motion
+
+SessionStart                    →   spawn / walk to desk
+PreToolUse: write | edit        →   sit + type
+PreToolUse: read | grep         →   sit + read
+PreToolUse: bash | terminal     →   lean into the rack
+PermissionRequest / gate        →   red bubble, freeze
+SubagentStart                   →   extra character from the VM
+BotMessage / handoff            →   walk to peer, talk
+RoutineTick                     →   clock spark, new job
+Stop / idle                     →   sit back, look at the window</pre>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap foot">
+      <div>
+        Pixel GrokBots is an independent demo inspired by
+        <a href="https://github.com/pixel-agents-hq/pixel-agents">Pixel Agents</a> (MIT).
+        Original code and sprites. Not affiliated with SpaceXAI / xAI.
+      </div>
+      <div><a href="https://github.com/Davidgon8/pixel-grokbots">github.com/Davidgon8/pixel-grokbots</a></div>
+    </div>
+  </footer>
+
+  <script>
+  (function () {
+    const canvas = document.getElementById("floor");
+    const ctx = canvas.getContext("2d");
+    const TILE = 28;
+    const COLS = 28;
+    const ROWS = 16;
+    const eventsEl = document.getElementById("events");
+    const inspectEl = document.getElementById("inspect");
+    const clockEl = document.getElementById("clock");
+
+    const BLOCK = new Set();
+    function block(x, y) { BLOCK.add(x + "," + y); }
+    function blocked(x, y) {
+      if (x < 1 || y < 1 || x > COLS - 2 || y > ROWS - 2) return true;
+      return BLOCK.has(x + "," + y);
+    }
+
+    const desks = [
+      { x: 4, y: 4, owner: "Orbit" },
+      { x: 9, y: 4, owner: "Nova" },
+      { x: 18, y: 4, owner: "Rex" },
+      { x: 23, y: 4, owner: "Mira" },
+      { x: 6, y: 11, owner: "Kai" },
+      { x: 21, y: 11, owner: "Sol" }
+    ];
+    desks.forEach(d => { block(d.x, d.y); block(d.x + 1, d.y); });
+    for (let x = 12; x <= 15; x++) for (let y = 7; y <= 9; y++) block(x, y);
+
+    const roster = [
+      { name: "Orbit", role: "orchestrator", color: "#8b7cff", skin: "#e7c7a4", hair: "#1b1b1b", x: 3, y: 6, desk: desks[0], job: "Splitting the weekly brief" },
+      { name: "Nova", role: "engineer", color: "#5dffb2", skin: "#c58a62", hair: "#2a1c12", x: 8, y: 6, desk: desks[1], job: "Patching the hook runtime" },
+      { name: "Rex", role: "research", color: "#6ee7ff", skin: "#f0d0b0", hair: "#3d2a18", x: 17, y: 6, desk: desks[2], job: "Filing a research brief" },
+      { name: "Mira", role: "ops", color: "#f2d27a", skin: "#d9a078", hair: "#5a3a22", x: 22, y: 6, desk: desks[3], job: "Reconciling last night's receipts" },
+      { name: "Kai", role: "sales", color: "#ff8a5a", skin: "#b57a52", hair: "#111", x: 5, y: 13, desk: desks[4], job: "Drafting the outbound sequence" },
+      { name: "Sol", role: "review", color: "#ff5a6a", skin: "#e2b48a", hair: "#4a2c14", x: 20, y: 13, desk: desks[5], job: "Holding the approval desk" }
+    ];
+
+    roster.forEach(b => {
+      b.state = "idle";
+      b.path = [];
+      b.frame = 0;
+      b.bubble = null;
+      b.facing = 1;
+      b.ghost = false;
+      b.wait = 40 + Math.floor(Math.random() * 80);
+    });
+
+    let selected = null;
+    let tick = 0;
+    const log = [];
+
+    function emit(bot, kind, text) {
+      const item = { t: clockEl.textContent, bot, kind, text };
+      log.unshift(item);
+      if (log.length > 18) log.pop();
+      eventsEl.innerHTML = log.map(e =>
+        `<div class="log-item"><span class="t">${e.t}</span> <b>${e.bot}</b> ${e.kind}<br>${e.text}</div>`
+      ).join("");
+    }
+
+    function pathfind(sx, sy, tx, ty) {
+      const key = (x, y) => x + "," + y;
+      const q = [[sx, sy]];
+      const seen = new Set([key(sx, sy)]);
+      const prev = new Map();
+      const dirs = [[1,0],[-1,0],[0,1],[0,-1]];
+      while (q.length) {
+        const [x, y] = q.shift();
+        if (x === tx && y === ty) {
+          const path = [];
+          let cur = key(x, y);
+          while (prev.has(cur)) {
+            const [px, py] = cur.split(",").map(Number);
+            path.push({ x: px, y: py });
+            cur = prev.get(cur);
+          }
+          path.reverse();
+          return path;
+        }
+        for (const [dx, dy] of dirs) {
+          const nx = x + dx, ny = y + dy;
+          if (seen.has(key(nx, ny))) continue;
+          if (blocked(nx, ny) && !(nx === tx && ny === ty)) continue;
+          seen.add(key(nx, ny));
+          prev.set(key(nx, ny), key(x, y));
+          q.push([nx, ny]);
+        }
+      }
+      return [];
+    }
+
+    const jobs = [
+      ["Orbit", "SessionStart", "Standing up the night crew"],
+      ["Nova", "PreToolUse:edit", "Writing the Grok Build provider"],
+      ["Rex", "PreToolUse:read", "Skimming last week's briefs"],
+      ["Mira", "RoutineTick", "Expense sweep just fired"],
+      ["Kai", "PermissionRequest", "Approve sending 12 outbound mails?"],
+      ["Sol", "BotMessage", "Holding Kai's send behind the gate"],
+      ["Orbit", "handoff", "Walking a brief over to Nova"],
+      ["Nova", "SubagentStart", "Spinning a worktree subagent"],
+      ["Rex", "PreToolUse:browse", "Checking x.ai/bot docs"],
+      ["Mira", "PreToolUse:read", "Opening the shared invoice folder"],
+      ["Kai", "Stop", "Draft parked until Sol signs off"],
+      ["Sol", "PermissionRequest", "Need a human on the wire transfer"]
+    ];
+    let jobIdx = 0;
+
+    function assign() {
+      const [name, kind, text] = jobs[jobIdx++ % jobs.length];
+      const bot = roster.find(b => b.name === name);
+      if (!bot) return;
+      bot.job = text;
+      bot.bubble = null;
+      bot.ghost = false;
+      if (kind === "PermissionRequest") {
+        bot.state = "wait";
+        bot.bubble = "!";
+        bot.path = pathfind(bot.x, bot.y, bot.desk.x, bot.desk.y + 1);
+      } else if (kind === "handoff") {
+        const peer = roster.find(b => b.name === "Nova");
+        bot.state = "walk";
+        bot.path = pathfind(bot.x, bot.y, peer.x, peer.y + 1);
+      } else if (kind === "SubagentStart") {
+        bot.state = "walk";
+        bot.path = pathfind(bot.x, bot.y, 13, 10);
+      } else if (kind.startsWith("PreToolUse") || kind === "RoutineTick" || kind === "SessionStart") {
+        bot.state = "walk";
+        bot.path = pathfind(bot.x, bot.y, bot.desk.x, bot.desk.y + 1);
+        if (kind.includes("edit")) bot.nextWork = "type";
+        else if (kind.includes("read") || kind.includes("browse")) bot.nextWork = "read";
+        else bot.nextWork = "type";
+      } else {
+        bot.state = "idle";
+      }
+      emit(name, kind, text);
+    }
+
+    function stepBots() {
+      for (const b of roster) {
+        b.frame++;
+        if (b.path && b.path.length) {
+          const n = b.path.shift();
+          b.facing = n.x >= b.x ? 1 : -1;
+          b.x = n.x; b.y = n.y;
+          b.state = "walk";
+          if (!b.path.length) {
+            if (b.bubble === "!") b.state = "wait";
+            else b.state = b.nextWork || "type";
+            b.wait = 80 + Math.floor(Math.random() * 60);
+          }
+        } else {
+          b.wait--;
+          if (b.wait <= 0 && b.state !== "wait") {
+            b.state = Math.random() < .3 ? "idle" : (b.nextWork || "type");
+            b.wait = 70;
+          }
+        }
+      }
+    }
+
+    function pix(x, y, w, h, c) {
+      ctx.fillStyle = c;
+      ctx.fillRect(x, y, w, h);
+    }
+
+    function drawFloor() {
+      for (let y = 0; y < ROWS; y++) {
+        for (let x = 0; x < COLS; x++) {
+          const night = (x + y) % 2 === 0 ? "#141821" : "#10131a";
+          pix(x * TILE, y * TILE, TILE, TILE, night);
+        }
+      }
+      ctx.fillStyle = "#1b1430";
+      ctx.fillRect(0, 0, COLS * TILE, TILE);
+      ctx.fillRect(0, (ROWS - 1) * TILE, COLS * TILE, TILE);
+      ctx.fillRect(0, 0, TILE, ROWS * TILE);
+      ctx.fillRect((COLS - 1) * TILE, 0, TILE, ROWS * TILE);
+      // window stars
+      ctx.fillStyle = "#6ee7ff";
+      for (let i = 0; i < 18; i++) {
+        ctx.fillRect(40 + i * 40, 8, 2, 2);
+      }
+      // carpet around VM
+      pix(11 * TILE, 6 * TILE, 5 * TILE, 5 * TILE, "#191427");
+      // VM rack
+      pix(12 * TILE + 6, 7 * TILE + 2, TILE * 3 - 12, TILE * 3 - 8, "#0b0c12");
+      pix(12 * TILE + 10, 7 * TILE + 8, TILE * 3 - 20, 6, "#8b7cff");
+      pix(12 * TILE + 10, 8 * TILE + 2, TILE * 3 - 20, 6, tick % 20 < 10 ? "#5dffb2" : "#2a6");
+      pix(12 * TILE + 10, 8 * TILE + 16, TILE * 3 - 20, 6, "#6ee7ff");
+      ctx.fillStyle = "#8b8894";
+      ctx.font = "9px IBM Plex Mono";
+      ctx.fillText("CLOUD VM", 12 * TILE + 16, 9 * TILE + 20);
+
+      desks.forEach(d => {
+        pix(d.x * TILE, d.y * TILE, TILE * 2, TILE, "#3a2a1c");
+        pix(d.x * TILE + 8, d.y * TILE + 4, 18, 12, "#1a1e28");
+        pix(d.x * TILE + 12, d.y * TILE + 6, 10, 6, "#6ee7ff");
+      });
+      // plants
+      pix(2 * TILE + 8, 8 * TILE, 12, 16, "#1f3d28");
+      pix(2 * TILE + 10, 7 * TILE + 10, 8, 10, "#3f7a48");
+      pix(25 * TILE + 8, 8 * TILE, 12, 16, "#1f3d28");
+      pix(25 * TILE + 10, 7 * TILE + 10, 8, 10, "#3f7a48");
+    }
+
+    function drawBot(b) {
+      const px = b.x * TILE + 6;
+      const bob = b.state === "walk" ? ((b.frame >> 2) % 2) : 0;
+      const py = b.y * TILE + 4 - bob;
+      ctx.save();
+      if (b.ghost) ctx.globalAlpha = 0.45;
+      if (b.facing < 0) {
+        ctx.translate(px + 16, 0);
+        ctx.scale(-1, 1);
+        ctx.translate(-px, 0);
+      }
+      pix(px + 4, py, 10, 6, b.hair);
+      pix(px + 3, py + 5, 12, 8, b.skin);
+      pix(px + 5, py + 7, 2, 2, "#111");
+      pix(px + 10, py + 7, 2, 2, "#111");
+      pix(px + 2, py + 13, 14, 12, b.color);
+      pix(px + 3, py + 25, 5, 8, "#1c2230");
+      pix(px + 10, py + 25, 5, 8, "#1c2230");
+      if (b.state === "type" && (b.frame >> 2) % 2) pix(px + 16, py + 16, 4, 3, "#efece4");
+      ctx.restore();
+      ctx.fillStyle = "#efece4";
+      ctx.font = "9px IBM Plex Mono";
+      ctx.textAlign = "center";
+      ctx.fillText(b.name, b.x * TILE + 14, b.y * TILE + 2);
+      ctx.textAlign = "left";
+      if (b.bubble) {
+        const bx = b.x * TILE + 18, by = b.y * TILE - 10;
+        pix(bx, by, 12, 12, "#ff5a6a");
+        ctx.fillStyle = "#fff";
+        ctx.font = "10px IBM Plex Mono";
+        ctx.fillText("!", bx + 4, by + 10);
+      }
+      if (selected === b) {
+        ctx.strokeStyle = "#efece4";
+        ctx.strokeRect(b.x * TILE, b.y * TILE, TILE, TILE);
+      }
+    }
+
+    function render() {
+      drawFloor();
+      [...roster].sort((a, b) => a.y - b.y).forEach(drawBot);
+    }
+
+    canvas.addEventListener("click", ev => {
+      const r = canvas.getBoundingClientRect();
+      const x = Math.floor((ev.clientX - r.left) / r.width * COLS);
+      const y = Math.floor((ev.clientY - r.top) / r.height * ROWS);
+      selected = roster.find(b => Math.abs(b.x - x) <= 1 && Math.abs(b.y - y) <= 1) || null;
+      if (selected) {
+        inspectEl.innerHTML = `<b>${selected.name}</b> · ${selected.role}<br>${selected.job}<br>state: ${selected.state}`;
+      }
+    });
+
+    function loop() {
+      tick++;
+      const d = new Date();
+      clockEl.textContent = d.toTimeString().slice(0, 8);
+      if (tick % 90 === 1) assign();
+      if (tick % 8 === 0) stepBots();
+      render();
+      requestAnimationFrame(loop);
+    }
+    assign();
+    loop();
+  })();
+  </script>
+</body>
+</html>
