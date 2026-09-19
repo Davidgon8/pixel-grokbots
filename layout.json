@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "office": "night-shift",
+  "updatedAt": null,
+  "desks": [
+    { "id": "chief", "x": 4, "y": 4, "label": "Chief", "kind": "named", "bot": "Orbit" },
+    { "id": "build", "x": 9, "y": 4, "label": "Build Bay", "kind": "named", "bot": "Nova" },
+    { "id": "research", "x": 18, "y": 4, "label": "Stacks", "kind": "named", "bot": "Rex" },
+    { "id": "ops", "x": 23, "y": 4, "label": "Ops", "kind": "named", "bot": "Mira" },
+    { "id": "sales", "x": 6, "y": 11, "label": "Outbound", "kind": "named", "bot": "Kai" },
+    { "id": "review", "x": 21, "y": 11, "label": "Approval", "kind": "named", "bot": "Sol" },
+    { "id": "hot-1", "x": 12, "y": 11, "label": "Hot desk 1", "kind": "hot", "bot": null },
+    { "id": "hot-2", "x": 14, "y": 11, "label": "Hot desk 2", "kind": "hot", "bot": null },
+    { "id": "hot-3", "x": 16, "y": 11, "label": "Hot desk 3", "kind": "hot", "bot": null }
+  ],
+  "bots": {
+    "Orbit": { "role": "orchestrator", "deskId": "chief", "color": "#8b7cff", "skin": "#e7c7a4", "hair": "#1b1b1b" },
+    "Nova": { "role": "engineer", "deskId": "build", "color": "#5dffb2", "skin": "#c58a62", "hair": "#2a1c12" },
+    "Rex": { "role": "research", "deskId": "research", "color": "#6ee7ff", "skin": "#f0d0b0", "hair": "#3d2a18" },
+    "Mira": { "role": "ops", "deskId": "ops", "color": "#f2d27a", "skin": "#d9a078", "hair": "#5a3a22" },
+    "Kai": { "role": "sales", "deskId": "sales", "color": "#ff8a5a", "skin": "#b57a52", "hair": "#111111" },
+    "Sol": { "role": "review", "deskId": "review", "color": "#ff5a6a", "skin": "#e2b48a", "hair": "#4a2c14" }
+  },
+  "sessions": {}
+}
